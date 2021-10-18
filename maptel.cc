@@ -43,7 +43,7 @@ namespace jnp1 {
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
-        if (tel_src == NULL || tel_dst == NULL) {
+        if (tel_src == nullptr || tel_dst == nullptr) {
             DEBUG("maptel: maptel_insert: NULL pointer passed, skipping");
             return;
         } else {
@@ -58,7 +58,7 @@ namespace jnp1 {
     }
 
     void maptel_erase(unsigned long id, char const *tel_src) {
-        if (tel_src == NULL) {
+        if (tel_src == nullptr) {
             DEBUG("maptel: maptel_erase: NULL pointer passed, skipping");
             return;
         } else {
