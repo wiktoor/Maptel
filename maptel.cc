@@ -132,7 +132,7 @@ namespace jnp1 {
         assert(dict != nullptr);
 
         string tel_src_str { tel_src };
-        DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << reinterpret_cast<void*>(tel_dst) << ", " << len << ")");
+        DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
         used_t used;
         string res;
         if (!transform_helper(*dict, tel_src_str, res, used)) {
