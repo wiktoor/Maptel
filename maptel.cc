@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cctype>
+#include <cassert>
 #include "maptel.h"
 using namespace std;
 
@@ -21,15 +22,23 @@ static directory& get_directory() {
     return *dir;
 }
 
-static bool tel_is_correct(string_view tel) {
-    if (tel.length() > jnp1::TEL_NUM_MAX_LEN)
-        return false;
+static void assert_tel_is_correct(string_view tel) {
+    assert(tel.length() <= jnp1::TEL_NUM_MAX_LEN);
 
     for (char c : tel) 
-        if (!isdigit(c))
-            return false;
+        assert(isdigit(c));
+}
 
-    return true;
+static dictionary* check_get_dictionary(unsigned long id) {
+    directory& dir = get_directory();
+    auto it = dir.find(id);
+
+    if (it == dir.end())
+        return nullptr;
+    else {
+        dictionary& dict = it->second;
+        return &dict;
+    }
 }
 
 namespace jnp1 {
@@ -49,46 +58,41 @@ namespace jnp1 {
 
         directory& dir = get_directory();
         size_t cnt = dir.erase(id);
+        assert(cnt != 0);
 
-        if (!cnt)
-            DEBUG("maptel: maptel_delete: nothing to delete");
-        else
-            DEBUG("maptel: maptel_delete: map " << id << " deleted");
+        DEBUG("maptel: maptel_delete: map " << id << " deleted");
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
-        if (tel_src == nullptr || tel_dst == nullptr) {
-            DEBUG("maptel: maptel_insert: NULL pointer passed, skipping");
-            return;
-        }
+        assert(tel_src != nullptr && tel_dst != nullptr);
 
         string_view tel_src_view { tel_src };
         string_view tel_dst_view { tel_dst };
 
-        if (!tel_is_correct(tel_src_view) || !tel_is_correct(tel_dst_view)) {
-            DEBUG("maptel: maptel_insert: telephone number not correct");
-            return;
-        }
+        assert_tel_is_correct(tel_src_view);
+        assert_tel_is_correct(tel_dst_view);
 
         DEBUG("maptel: maptel_insert(" << id << ", " << tel_src << ", "
                 << tel_dst << ")");
 
-        dictionary& dict = get_directory()[id];
-        dict[tel_src] = string(tel_dst);
+        dictionary* dict = check_get_dictionary(id);
+        assert(dict != nullptr);
+
+        (*dict)[tel_src] = string(tel_dst);
 
         DEBUG("maptel: maptel_insert: inserted");
     }
 
     void maptel_erase(unsigned long id, char const *tel_src) {
-        if (tel_src == nullptr) {
-            DEBUG("maptel: maptel_erase: NULL pointer passed, skipping");
-            return;
-        } else {
-            DEBUG("maptel: maptel_erase(" << id << ", " << tel_src << ")");
-        }
+        assert(tel_src != nullptr);
+        assert_tel_is_correct(tel_src);
 
-        dictionary& dict = get_directory()[id];
-        size_t cnt = dict.erase(tel_src);
+        DEBUG("maptel: maptel_erase(" << id << ", " << tel_src << ")");
+
+        dictionary* dict = check_get_dictionary(id);
+        assert(dict != nullptr);
+
+        size_t cnt = dict->erase(tel_src);
 
         if (!cnt)
             DEBUG("maptel: maptel_erase: nothing to erase");
@@ -111,27 +115,27 @@ namespace jnp1 {
         }
     }
 
-    static void update_dst(string tel_src_str, char *tel_dst, size_t len) {
-        if (tel_src_str.size() > len) {
-            // ERROR (?)
-        }
-        else {
-            for (size_t i = 0; i < tel_src_str.size(); i++) tel_dst[i] = tel_src_str[i];
-            tel_dst[tel_src_str.size()] = '\0';
-        }
+    static void update_dst(string& tel_src_str, char *tel_dst, size_t len) {
+        assert(tel_src_str.size() + 1 <= len);
+
+        for (size_t i = 0; i < tel_src_str.size(); i++)
+            tel_dst[i] = tel_src_str[i];
+
+        tel_dst[tel_src_str.size()] = '\0';
     }
 
     void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
-        if (tel_src == nullptr || tel_dst == nullptr) {
-            DEBUG("maptel: maptel_transform: NULL pointer passed, skipping");
-            return;
-        }
-        dictionary& dict = get_directory()[id];
+        assert(tel_src != nullptr && tel_dst != nullptr);
+        assert_tel_is_correct(tel_src);
+
+        dictionary* dict = check_get_dictionary(id);
+        assert(dict != nullptr);
+
         string tel_src_str { tel_src };
         DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << reinterpret_cast<void*>(tel_dst) << ", " << len << ")");
         used_t used;
         string res;
-        if (!transform_helper(dict, tel_src_str, res, used)) {
+        if (!transform_helper(*dict, tel_src_str, res, used)) {
             res = tel_src_str;
         }
         update_dst(res, tel_dst, len);
