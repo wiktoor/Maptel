@@ -1,6 +1,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <cctype>
 #include "maptel.h"
 using namespace std;
 
@@ -16,6 +17,17 @@ using directory = unordered_map<unsigned long, dictionary>;
 static directory& get_directory() {
     static directory* dir = new directory();
     return *dir;
+}
+
+static bool tel_is_correct(string_view tel) {
+    if (tel.length() > jnp1::TEL_NUM_MAX_LEN)
+        return false;
+
+    for (char c : tel) 
+        if (!isdigit(c))
+            return false;
+
+    return true;
 }
 
 namespace jnp1 {
@@ -49,6 +61,14 @@ namespace jnp1 {
         } else {
             DEBUG("maptel: maptel_insert("
                     << id << ", " << tel_src << ", " << tel_dst << ")");
+        }
+
+        string_view tel_src_str { tel_src };
+        string_view tel_dst_str { tel_src };
+
+        if (!tel_is_correct(tel_src_str) || !tel_is_correct(tel_dst_str)) {
+            DEBUG("maptel: maptel_insert: telephone number not correct");
+            return;
         }
 
         dictionary& dict = get_directory()[id];
