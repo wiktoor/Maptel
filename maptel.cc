@@ -53,7 +53,7 @@ namespace jnp1 {
         if (!cnt)
             DEBUG("maptel: maptel_delete: nothing to delete");
         else
-            DEBUG("maptel: maptel_delete: map " << id << "deleted");
+            DEBUG("maptel: maptel_delete: map " << id << " deleted");
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
@@ -63,7 +63,7 @@ namespace jnp1 {
         }
 
         string_view tel_src_view { tel_src };
-        string_view tel_dst_view { tel_src };
+        string_view tel_dst_view { tel_dst };
 
         if (!tel_is_correct(tel_src_view) || !tel_is_correct(tel_dst_view)) {
             DEBUG("maptel: maptel_insert: telephone number not correct");
@@ -96,8 +96,11 @@ namespace jnp1 {
             DEBUG("maptel: maptel_erase: erased");
     }
 
-    bool transform_helper(dictionary& dict, string tel_src_str, string &res, used_t& used) {
-        if (used.count(tel_src_str) != 0) return false;
+    static bool transform_helper(dictionary& dict, string tel_src_str, string &res, used_t& used) {
+        if (used.count(tel_src_str) != 0) {
+            DEBUG("maptel: maptel_transform: cycle detected");
+            return false;
+        }
         else if (dict.count(tel_src_str) == 0) {
             res = tel_src_str;
             return true;
@@ -108,25 +111,26 @@ namespace jnp1 {
         }
     }
 
-    void update_dst(string tel_src_str, char *tel_dst, size_t len) {
-        if (tel_src_str.size() != len) {
-            // ERROR
+    static void update_dst(string tel_src_str, char *tel_dst, size_t len) {
+        if (tel_src_str.size() > len) {
+            // ERROR (?)
         }
         else {
-            for (size_t i = 0; i < len; i++) tel_dst[i] = tel_src_str[i];
+            for (size_t i = 0; i < tel_src_str.size(); i++) tel_dst[i] = tel_src_str[i];
+            tel_dst[tel_src_str.size()] = '\0';
         }
     }
 
-    void maptel_tranform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
+    void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
         dictionary& dict = get_directory()[id];
         string tel_src_str { tel_src };
+        DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << reinterpret_cast<void*>(tel_dst) << ", " << len << ")");
         used_t used;
         string res;
-        if (transform_helper(dict, tel_src_str, res, used)) {
-            update_dst(res, tel_dst, len);
+        if (!transform_helper(dict, tel_src_str, res, used)) {
+            res = tel_src_str;
         }
-        else {
-            update_dst(tel_src_str, tel_dst, len);
-        }
+        update_dst(res, tel_dst, len);
+        DEBUG("maptel: maptel_tranform: " << tel_src_str << " -> " << res);
     }
 }
