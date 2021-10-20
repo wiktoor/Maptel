@@ -74,7 +74,7 @@ namespace jnp1 {
                 << tel_dst << ")");
 
         dictionary& dict = get_directory()[id];
-        dict.emplace(tel_src_view, tel_dst_view);
+        dict[tel_src] = string(tel_dst);
 
         DEBUG("maptel: maptel_insert: inserted");
     }
@@ -122,6 +122,10 @@ namespace jnp1 {
     }
 
     void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
+        if (tel_src == nullptr || tel_dst == nullptr) {
+            DEBUG("maptel: maptel_transform: NULL pointer passed, skipping");
+            return;
+        }
         dictionary& dict = get_directory()[id];
         string tel_src_str { tel_src };
         DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << reinterpret_cast<void*>(tel_dst) << ", " << len << ")");
