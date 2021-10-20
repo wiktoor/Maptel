@@ -131,6 +131,6 @@ namespace jnp1 {
             res = tel_src_str;
         }
         update_dst(res, tel_dst, len);
-        DEBUG("maptel: maptel_tranform: " << tel_src_str << " -> " << res);
+        DEBUG("maptel: maptel_transform: " << tel_src_str << " -> " << res);
     }
 }
