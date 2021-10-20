@@ -1,4 +1,5 @@
 #include <string>
+#include <set>
 #include <unordered_map>
 #include <iostream>
 #include <cctype>
@@ -13,6 +14,7 @@ using namespace std;
 
 using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
+using used_t = set<string>;
 
 static directory& get_directory() {
     static directory* dir = new directory();
@@ -92,5 +94,39 @@ namespace jnp1 {
             DEBUG("maptel: maptel_erase: nothing to erase");
         else
             DEBUG("maptel: maptel_erase: erased");
+    }
+
+    bool transform_helper(dictionary& dict, string tel_src_str, string &res, used_t& used) {
+        if (used.count(tel_src_str) != 0) return false;
+        else if (dict.count(tel_src_str) == 0) {
+            res = tel_src_str;
+            return true;
+        }
+        else {
+            used.insert(tel_src_str);
+            return transform_helper(dict, dict.at(tel_src_str), res, used);
+        }
+    }
+
+    void update_dst(string tel_src_str, char *tel_dst, size_t len) {
+        if (tel_src_str.size() != len) {
+            // ERROR
+        }
+        else {
+            for (size_t i = 0; i < len; i++) tel_dst[i] = tel_src_str[i];
+        }
+    }
+
+    void maptel_tranform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
+        dictionary& dict = get_directory()[id];
+        string tel_src_str { tel_src };
+        used_t used;
+        string res;
+        if (transform_helper(dict, tel_src_str, res, used)) {
+            update_dst(res, tel_dst, len);
+        }
+        else {
+            update_dst(tel_src_str, tel_dst, len);
+        }
     }
 }
