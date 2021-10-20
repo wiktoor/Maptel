@@ -58,21 +58,21 @@ namespace jnp1 {
         if (tel_src == nullptr || tel_dst == nullptr) {
             DEBUG("maptel: maptel_insert: NULL pointer passed, skipping");
             return;
-        } else {
-            DEBUG("maptel: maptel_insert("
-                    << id << ", " << tel_src << ", " << tel_dst << ")");
         }
 
-        string_view tel_src_str { tel_src };
-        string_view tel_dst_str { tel_src };
+        string_view tel_src_view { tel_src };
+        string_view tel_dst_view { tel_src };
 
-        if (!tel_is_correct(tel_src_str) || !tel_is_correct(tel_dst_str)) {
+        if (!tel_is_correct(tel_src_view) || !tel_is_correct(tel_dst_view)) {
             DEBUG("maptel: maptel_insert: telephone number not correct");
             return;
         }
 
+        DEBUG("maptel: maptel_insert(" << id << ", " << tel_src << ", "
+                << tel_dst << ")");
+
         dictionary& dict = get_directory()[id];
-        dict.emplace(tel_src, tel_dst);
+        dict.emplace(tel_src_view, tel_dst_view);
 
         DEBUG("maptel: maptel_insert: inserted");
     }
