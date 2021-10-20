@@ -7,9 +7,9 @@
 using namespace std;
 
 #ifdef NDEBUG
-    #define DEBUG(x) ;
+    #define DEBUG(x) do { } while(0)
 #else
-    #define DEBUG(x) clog << x << '\n'
+    #define DEBUG(x) do { cerr << x << '\n'; } while(0)
 #endif
 
 using dictionary = unordered_map<string, string>;
