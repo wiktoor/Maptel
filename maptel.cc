@@ -10,7 +10,7 @@ using namespace std;
 #ifdef NDEBUG
     #define DEBUG(x) do { } while(0)
 #else
-    #define DEBUG(x) do { cerr << x << '\n'; } while(0)
+    #define DEBUG(x) do { cerr << "maptel: maptel_" << x << '\n'; } while(0)
 #endif
 
 using dictionary = unordered_map<string, string>;
@@ -43,24 +43,24 @@ static dictionary* check_get_dictionary(unsigned long id) {
 
 namespace jnp1 {
     unsigned long maptel_create(void) {
-        DEBUG("maptel: maptel_create()");
+        DEBUG("create()");
 
         directory& dir = get_directory();
         static unsigned long gid = 0;
         dir.emplace(gid, dictionary());
 
-        DEBUG("maptel: maptel_create: new map id = " << gid);
+        DEBUG("create: new map id = " << gid);
         return gid++;
     }
 
     void maptel_delete(unsigned long id) {
-        DEBUG("maptel: maptel_delete(" << id << ")");
+        DEBUG("delete(" << id << ")");
 
         directory& dir = get_directory();
         size_t cnt = dir.erase(id);
         assert(cnt != 0);
 
-        DEBUG("maptel: maptel_delete: map " << id << " deleted");
+        DEBUG("delete: map " << id << " deleted");
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
@@ -72,7 +72,7 @@ namespace jnp1 {
         assert_tel_is_correct(tel_src_view);
         assert_tel_is_correct(tel_dst_view);
 
-        DEBUG("maptel: maptel_insert(" << id << ", " << tel_src << ", "
+        DEBUG("insert(" << id << ", " << tel_src << ", "
                 << tel_dst << ")");
 
         dictionary* dict = check_get_dictionary(id);
@@ -80,14 +80,14 @@ namespace jnp1 {
 
         (*dict)[tel_src] = string(tel_dst);
 
-        DEBUG("maptel: maptel_insert: inserted");
+        DEBUG("insert: inserted");
     }
 
     void maptel_erase(unsigned long id, char const *tel_src) {
         assert(tel_src != nullptr);
         assert_tel_is_correct(tel_src);
 
-        DEBUG("maptel: maptel_erase(" << id << ", " << tel_src << ")");
+        DEBUG("erase(" << id << ", " << tel_src << ")");
 
         dictionary* dict = check_get_dictionary(id);
         assert(dict != nullptr);
@@ -95,14 +95,14 @@ namespace jnp1 {
         size_t cnt = dict->erase(tel_src);
 
         if (!cnt)
-            DEBUG("maptel: maptel_erase: nothing to erase");
+            DEBUG("erase: nothing to erase");
         else
-            DEBUG("maptel: maptel_erase: erased");
+            DEBUG("erase: erased");
     }
 
     static bool transform_helper(dictionary& dict, string tel_src_str, string &res, used_t& used) {
         if (used.count(tel_src_str) != 0) {
-            DEBUG("maptel: maptel_transform: cycle detected");
+            DEBUG("transform: cycle detected");
             return false;
         }
         else if (dict.count(tel_src_str) == 0) {
@@ -132,13 +132,13 @@ namespace jnp1 {
         assert(dict != nullptr);
 
         string tel_src_str { tel_src };
-        DEBUG("maptel: maptel_transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
+        DEBUG("transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
         used_t used;
         string res;
         if (!transform_helper(*dict, tel_src_str, res, used)) {
             res = tel_src_str;
         }
         update_dst(res, tel_dst, len);
-        DEBUG("maptel: maptel_transform: " << tel_src_str << " -> " << res);
+        DEBUG("transform: " << tel_src_str << " -> " << res);
     }
 }
