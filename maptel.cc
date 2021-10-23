@@ -100,7 +100,7 @@ namespace jnp1 {
             DEBUG("erase: erased");
     }
 
-    static bool transform_helper(dictionary& dict, string tel_src_str, string &res, used_t& used) {
+    static bool transform_helper(dictionary& dict, string& tel_src_str, string &res, used_t& used) {
         if (used.count(tel_src_str) != 0) {
             DEBUG("transform: cycle detected");
             return false;
