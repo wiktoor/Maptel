@@ -12,7 +12,7 @@
 extern "C" {
 namespace jnp1 {
 #endif
-  const size_t TEL_NUM_MAX_LEN = 22;
+  static const size_t TEL_NUM_MAX_LEN = 22;
 
   // Tworzy słownik i zwraca liczbę naturalną będącą jego identyfikatorem.
   unsigned long maptel_create(void);
