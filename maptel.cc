@@ -26,7 +26,7 @@ static void assert_tel_is_correct(const char* tel) {
 #ifndef NDEBUG
     assert(tel != nullptr);
 
-    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN; ++i) {
+    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
         if (tel[i] == '\0')
             return; /* the end of string */
         else
