@@ -80,7 +80,6 @@ namespace jnp1 {
                 << tel_dst << ")");
 
         dictionary* dict = check_get_dictionary(id);
-
         (*dict)[tel_src] = string(tel_dst);
 
         DEBUG("insert: inserted");
@@ -92,8 +91,6 @@ namespace jnp1 {
         DEBUG("erase(" << id << ", " << tel_src << ")");
 
         dictionary* dict = check_get_dictionary(id);
-        assert(dict != nullptr);
-
         size_t cnt = dict->erase(tel_src);
 
         if (!cnt)
@@ -131,7 +128,6 @@ namespace jnp1 {
         assert_tel_is_correct(tel_src);
 
         dictionary* dict = check_get_dictionary(id);
-        assert(dict != nullptr);
 
         string tel_src_str { tel_src };
         DEBUG("transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
