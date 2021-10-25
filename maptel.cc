@@ -32,38 +32,38 @@ using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
 using used_t = set<string>;
 
-static directory& get_directory() {
-    static directory* dir = new directory();
-    return *dir;
-}
-
-static void assert_tel_is_correct(const char* tel) {
-    CHECK_CORRECTNESS(tel != nullptr);
-
-    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
-        if (tel[i] == '\0')
-            return; /* the end of string */
-        else
-            CHECK_CORRECTNESS(isdigit(tel[i]));
-    }
-
-    /* Telephone number is larger than 22 characters. */
-    CHECK_CORRECTNESS(false);
-}
-
-static dictionary* check_get_dictionary(unsigned long id) {
-    directory& dir = get_directory();
-    auto it = dir.find(id);
-
-    if (it == dir.end())
-        CHECK_CORRECTNESS(false); /* dictionary not found */
-    else {
-        dictionary& dict = it->second;
-        return &dict;
-    }
-}
-
 namespace jnp1 {
+    static directory& get_directory() {
+        static directory* dir = new directory();
+        return *dir;
+    }
+
+    static void assert_tel_is_correct(const char* tel) {
+        CHECK_CORRECTNESS(tel != nullptr);
+
+        for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
+            if (tel[i] == '\0')
+                return; /* the end of string */
+            else
+                CHECK_CORRECTNESS(isdigit(tel[i]));
+        }
+
+        /* Telephone number is larger than 22 characters. */
+        CHECK_CORRECTNESS(false);
+    }
+
+    static dictionary* check_get_dictionary(unsigned long id) {
+        directory& dir = get_directory();
+        auto it = dir.find(id);
+
+        if (it == dir.end())
+            CHECK_CORRECTNESS(false); /* dictionary not found */
+        else {
+            dictionary& dict = it->second;
+            return &dict;
+        }
+    }
+
     unsigned long maptel_create(void) {
         DEBUG("create()");
 
