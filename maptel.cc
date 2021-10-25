@@ -8,10 +8,15 @@
 using namespace std;
 
 #ifdef NDEBUG
-    #define DEBUG(x) do { } while(0)
+    static constexpr bool debug = false;
 #else
-    #define DEBUG(x) do { cerr << "maptel: maptel_" << x << '\n'; } while(0)
+    static constexpr bool debug = true;
 #endif
+
+#define DEBUG(x)                                                        \
+    do {                                                                \
+        if (debug) std::cerr << "maptel: maptel_" << x << '\n';         \
+    } while(0)
 
 using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
@@ -23,19 +28,19 @@ static directory& get_directory() {
 }
 
 static void assert_tel_is_correct(const char* tel) {
-#ifndef NDEBUG
-    assert(tel != nullptr);
+    if (debug) {
+        assert(tel != nullptr);
 
-    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
-        if (tel[i] == '\0')
-            return; /* the end of string */
-        else
-            assert(isdigit(tel[i]));
+        for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
+            if (tel[i] == '\0')
+                return; /* the end of string */
+            else
+                assert(isdigit(tel[i]));
+        }
+
+        /* Telephone number is larger than 22 characters. */
+        assert(false);
     }
-
-    /* Telephone number is larger than 22 characters. */
-    assert(false);
-#endif
 }
 
 static dictionary* check_get_dictionary(unsigned long id) {
