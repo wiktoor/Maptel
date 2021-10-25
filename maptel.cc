@@ -55,16 +55,14 @@ namespace jnp1 {
         }
     }
 
-    dictionary* check_get_dictionary(unsigned long id) {
+    dictionary& get_dictionary(unsigned long id) {
         directory& dir = get_directory();
         auto it = dir.find(id);
 
-        if (it == dir.end())
-            CHECK_CORRECTNESS(false); /* dictionary not found */
-        else {
-            dictionary& dict = it->second;
-            return &dict;
-        }
+        assert(it != dir.end());  /* dictionary not found */
+
+        dictionary& dict = it->second;
+        return dict;
     }
 
     unsigned long maptel_create(void) {
@@ -94,8 +92,8 @@ namespace jnp1 {
 
         DEBUG("insert(" << id << ", " << tel_src << ", " << tel_dst << ")");
 
-        dictionary* dict = check_get_dictionary(id);
-        (*dict)[tel_src] = string(tel_dst);
+        dictionary& dict = get_dictionary(id);
+        dict[tel_src] = string(tel_dst);
 
         DEBUG("insert: inserted");
     }
@@ -105,8 +103,8 @@ namespace jnp1 {
 
         DEBUG("erase(" << id << ", " << tel_src << ")");
 
-        dictionary* dict = check_get_dictionary(id);
-        size_t cnt = dict->erase(tel_src);
+        dictionary& dict = get_dictionary(id);
+        size_t cnt = dict.erase(tel_src);
 
         if (!cnt)
             DEBUG("erase: nothing to erase");
@@ -147,13 +145,13 @@ namespace jnp1 {
         CHECK_CORRECTNESS(tel_dst != nullptr);
         assert_tel_is_correct(tel_src);
 
-        dictionary* dict = check_get_dictionary(id);
+        dictionary& dict = get_dictionary(id);
 
         string tel_src_str { tel_src };
         DEBUG("transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
         used_t used;
         string res;
-        if (!transform_helper(*dict, tel_src_str, res, used)) {
+        if (!transform_helper(dict, tel_src_str, res, used)) {
             res = tel_src_str;
         }
         update_dst(res, tel_dst, len);
