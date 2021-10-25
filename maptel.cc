@@ -109,13 +109,16 @@ namespace jnp1 {
             DEBUG("transform: cycle detected");
             return false;
         }
-        else if (dict.count(tel_src_str) == 0) {
+
+        auto it = dict.find(tel_src_str);
+
+        if (it == dict.end()) {
             res = tel_src_str;
             return true;
         }
         else {
             used.insert(tel_src_str);
-            return transform_helper(dict, dict.at(tel_src_str), res, used);
+            return transform_helper(dict, it->second, res, used);
         }
     }
 
