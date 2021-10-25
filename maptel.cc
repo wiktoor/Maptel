@@ -19,16 +19,14 @@ using namespace std;
         if (debug) std::cerr << "maptel: maptel_" << x << '\n';         \
     } while(0)
 
-#ifdef NDEBUG
 #define CHECK_CORRECTNESS(conditional) \
     do {                               \
-        if (!(conditional))            \
+        if (debug) {                   \
+            assert(conditional);       \
+        } else if (!(conditional)) {   \
             std::abort();              \
+        }                              \
     } while(0)
-#else
-#define CHECK_CORRECTNESS(conditional) \
-        assert(conditional)
-#endif
 
 using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
@@ -40,19 +38,17 @@ static directory& get_directory() {
 }
 
 static void assert_tel_is_correct(const char* tel) {
-    if (debug) {
-        CHECK_CORRECTNESS(tel != nullptr);
+    CHECK_CORRECTNESS(tel != nullptr);
 
-        for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
-            if (tel[i] == '\0')
-                return; /* the end of string */
-            else
-                CHECK_CORRECTNESS(isdigit(tel[i]));
-        }
-
-        /* Telephone number is larger than 22 characters. */
-        CHECK_CORRECTNESS(false);
+    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
+        if (tel[i] == '\0')
+            return; /* the end of string */
+        else
+            CHECK_CORRECTNESS(isdigit(tel[i]));
     }
+
+    /* Telephone number is larger than 22 characters. */
+    CHECK_CORRECTNESS(false);
 }
 
 static dictionary* check_get_dictionary(unsigned long id) {
