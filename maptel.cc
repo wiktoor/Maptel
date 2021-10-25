@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cctype>
+#include <cstdlib>
 #include <cassert>
 #include "maptel.h"
 using namespace std;
@@ -18,6 +19,17 @@ using namespace std;
         if (debug) std::cerr << "maptel: maptel_" << x << '\n';         \
     } while(0)
 
+#ifdef NDEBUG
+#define CHECK_CORRECTNESS(conditional) \
+    do {                               \
+        if (!(conditional))            \
+            std::abort();              \
+    } while(0)
+#else
+#define CHECK_CORRECTNESS(conditional) \
+        assert(conditional)
+#endif
+
 using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
 using used_t = set<string>;
@@ -29,17 +41,17 @@ static directory& get_directory() {
 
 static void assert_tel_is_correct(const char* tel) {
     if (debug) {
-        assert(tel != nullptr);
+        CHECK_CORRECTNESS(tel != nullptr);
 
         for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
             if (tel[i] == '\0')
                 return; /* the end of string */
             else
-                assert(isdigit(tel[i]));
+                CHECK_CORRECTNESS(isdigit(tel[i]));
         }
 
         /* Telephone number is larger than 22 characters. */
-        assert(false);
+        CHECK_CORRECTNESS(false);
     }
 }
 
@@ -48,7 +60,7 @@ static dictionary* check_get_dictionary(unsigned long id) {
     auto it = dir.find(id);
 
     if (it == dir.end())
-        assert(false); /* dictionary not found */
+        CHECK_CORRECTNESS(false); /* dictionary not found */
     else {
         dictionary& dict = it->second;
         return &dict;
@@ -72,7 +84,7 @@ namespace jnp1 {
 
         directory& dir = get_directory();
         size_t cnt = dir.erase(id);
-        assert(cnt != 0);
+        CHECK_CORRECTNESS(cnt != 0);
 
         DEBUG("delete: map " << id << " deleted");
     }
@@ -123,7 +135,7 @@ namespace jnp1 {
     }
 
     static void update_dst(string& tel_src_str, char *tel_dst, size_t len) {
-        assert(tel_src_str.size() + 1 <= len);
+        CHECK_CORRECTNESS(tel_src_str.size() + 1 <= len);
 
         for (size_t i = 0; i < tel_src_str.size(); i++)
             tel_dst[i] = tel_src_str[i];
@@ -132,7 +144,7 @@ namespace jnp1 {
     }
 
     void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
-        assert(tel_dst != nullptr);
+        CHECK_CORRECTNESS(tel_dst != nullptr);
         assert_tel_is_correct(tel_src);
 
         dictionary* dict = check_get_dictionary(id);
