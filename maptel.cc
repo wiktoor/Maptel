@@ -22,11 +22,20 @@ static directory& get_directory() {
     return *dir;
 }
 
-static void assert_tel_is_correct(string_view tel) {
-    assert(tel.length() <= jnp1::TEL_NUM_MAX_LEN);
+static void assert_tel_is_correct(const char* tel) {
+#ifndef NDEBUG
+    assert(tel != nullptr);
 
-    for (char c : tel) 
-        assert(isdigit(c));
+    for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN; ++i) {
+        if (tel[i] == '\0')
+            return; /* the end of string */
+        else
+            assert(isdigit(tel[i]));
+    }
+
+    /* Telephone number is larger than 22 characters. */
+    assert(false);
+#endif
 }
 
 static dictionary* check_get_dictionary(unsigned long id) {
@@ -34,7 +43,7 @@ static dictionary* check_get_dictionary(unsigned long id) {
     auto it = dir.find(id);
 
     if (it == dir.end())
-        return nullptr;
+        assert(false); /* dictionary not found */
     else {
         dictionary& dict = it->second;
         return &dict;
@@ -64,19 +73,13 @@ namespace jnp1 {
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
-        assert(tel_src != nullptr && tel_dst != nullptr);
-
-        string_view tel_src_view { tel_src };
-        string_view tel_dst_view { tel_dst };
-
-        assert_tel_is_correct(tel_src_view);
-        assert_tel_is_correct(tel_dst_view);
+        assert_tel_is_correct(tel_src);
+        assert_tel_is_correct(tel_dst);
 
         DEBUG("insert(" << id << ", " << tel_src << ", "
                 << tel_dst << ")");
 
         dictionary* dict = check_get_dictionary(id);
-        assert(dict != nullptr);
 
         (*dict)[tel_src] = string(tel_dst);
 
@@ -84,7 +87,6 @@ namespace jnp1 {
     }
 
     void maptel_erase(unsigned long id, char const *tel_src) {
-        assert(tel_src != nullptr);
         assert_tel_is_correct(tel_src);
 
         DEBUG("erase(" << id << ", " << tel_src << ")");
@@ -125,7 +127,7 @@ namespace jnp1 {
     }
 
     void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
-        assert(tel_src != nullptr && tel_dst != nullptr);
+        assert(tel_dst != nullptr);
         assert_tel_is_correct(tel_src);
 
         dictionary* dict = check_get_dictionary(id);
