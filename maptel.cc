@@ -5,6 +5,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #include "maptel.h"
 using namespace std;
 
