@@ -134,11 +134,7 @@ namespace jnp1 {
 
         void update_dst(string& tel_src_str, char *tel_dst, size_t len) {
             CHECK_CORRECTNESS(tel_src_str.size() + 1 <= len);
-
-            for (size_t i = 0; i < tel_src_str.size(); i++)
-                tel_dst[i] = tel_src_str[i];
-
-            tel_dst[tel_src_str.size()] = '\0';
+            strcpy(tel_dst, tel_src_str.c_str());
         }
     }
 
