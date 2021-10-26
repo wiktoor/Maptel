@@ -42,6 +42,7 @@ namespace jnp1 {
 
         void assert_tel_is_correct(const char* tel) {
             CHECK_CORRECTNESS(tel != nullptr);
+            CHECK_CORRECTNESS(*tel != '\0');
 
             for (size_t i = 0; i < jnp1::TEL_NUM_MAX_LEN + 1; ++i) {
                 if (tel[i] == '\0')
@@ -113,7 +114,7 @@ namespace jnp1 {
     }
 
     namespace {
-        bool transform_helper(dictionary& dict, string& tel_src_str, string &res, used_t& used) {
+        bool transform_helper(dictionary& dict, string& tel_src_str, string& res, used_t& used) {
             if (used.count(tel_src_str) != 0) {
                 DEBUG("transform: cycle detected");
                 return false;
