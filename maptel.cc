@@ -41,7 +41,7 @@ namespace jnp1 {
             return *dir;
         }
 
-        void assert_tel_is_correct(const char* tel) {
+        void check_tel_is_correct(const char* tel) {
             CHECK_CORRECTNESS(tel != nullptr);
             CHECK_CORRECTNESS(*tel != '\0');
 
@@ -61,7 +61,7 @@ namespace jnp1 {
         directory& dir = get_directory();
         auto it = dir.find(id);
 
-        assert(it != dir.end());  /* dictionary not found */
+        CHECK_CORRECTNESS(it != dir.end());  /* dictionary not found */
 
         dictionary& dict = it->second;
         return dict;
@@ -89,8 +89,8 @@ namespace jnp1 {
     }
 
     void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst) {
-        assert_tel_is_correct(tel_src);
-        assert_tel_is_correct(tel_dst);
+        check_tel_is_correct(tel_src);
+        check_tel_is_correct(tel_dst);
 
         DEBUG("insert(" << id << ", " << tel_src << ", " << tel_dst << ")");
 
@@ -101,7 +101,7 @@ namespace jnp1 {
     }
 
     void maptel_erase(unsigned long id, char const *tel_src) {
-        assert_tel_is_correct(tel_src);
+        check_tel_is_correct(tel_src);
 
         DEBUG("erase(" << id << ", " << tel_src << ")");
 
@@ -141,7 +141,7 @@ namespace jnp1 {
 
     void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len) {
         CHECK_CORRECTNESS(tel_dst != nullptr);
-        assert_tel_is_correct(tel_src);
+        check_tel_is_correct(tel_src);
 
         dictionary& dict = get_dictionary(id);
 
