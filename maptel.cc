@@ -1,3 +1,4 @@
+/* Wiktor Chmielewski, 429131; Przemysław Kusiak, 421087 */
 #include <string>
 #include <set>
 #include <unordered_map>
@@ -32,7 +33,7 @@ using namespace std;
 
 using dictionary = unordered_map<string, string>;
 using directory = unordered_map<unsigned long, dictionary>;
-using used_t = set<string>;
+using nodes_visited = set<string>;
 
 namespace jnp1 {
     namespace {
@@ -115,7 +116,7 @@ namespace jnp1 {
     }
 
     namespace {
-        bool transform_helper(dictionary& dict, string& tel_src_str, string& res, used_t& used) {
+        bool transform_helper(dictionary& dict, string& tel_src_str, string& res, nodes_visited& used) {
             if (used.count(tel_src_str) != 0) {
                 DEBUG("transform: cycle detected");
                 return false;
@@ -126,8 +127,7 @@ namespace jnp1 {
             if (it == dict.end()) {
                 res = tel_src_str;
                 return true;
-            }
-            else {
+            } else {
                 used.insert(tel_src_str);
                 return transform_helper(dict, it->second, res, used);
             }
@@ -144,15 +144,17 @@ namespace jnp1 {
         check_tel_is_correct(tel_src);
 
         dictionary& dict = get_dictionary(id);
-
         string tel_src_str { tel_src };
-        DEBUG("transform(" << id << ", " << tel_src_str << ", " << "ADDR" << ", " << len << ")");
-        used_t used;
+
+        DEBUG("transform(" << id << ", " << tel_src_str << ", " << reinterpret_cast<void*>(tel_dst) << ", " << len << ")");
+
+        nodes_visited used;
         string res;
-        if (!transform_helper(dict, tel_src_str, res, used)) {
+
+        if (!transform_helper(dict, tel_src_str, res, used))
             res = tel_src_str;
-        }
         update_dst(res, tel_dst, len);
+
         DEBUG("transform: " << tel_src_str << " -> " << res);
     }
 }
